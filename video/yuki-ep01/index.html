@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="en" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>Yuki's Cozy Kitchen Diaries — Episode 01: Chicken Teriyaki Rice Bowl</title>
+    <script src="assets/vendor/gsap.min.js"></script>
+    <style>
+      @font-face { font-family: "Diary"; src: url("assets/fonts/Caladea-Regular.ttf"); font-weight: 400; font-style: normal; }
+      @font-face { font-family: "Diary"; src: url("assets/fonts/Caladea-Italic.ttf"); font-weight: 400; font-style: italic; }
+      @font-face { font-family: "Diary"; src: url("assets/fonts/Caladea-Bold.ttf"); font-weight: 700; font-style: normal; }
+      :root {
+        --ground: #2a211b;
+        --cream: #f7eddc;
+        --paper: #fbf4e6;
+        --ink: #3a2a1f;
+        --sage: #7f9a74;
+        --sage-deep: #5d7a55;
+        --amber: #c98a3c;
+        --font-display: "Diary", Georgia, serif;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--ground); }
+      #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; font-family: var(--font-display); color: var(--ink); }
+
+      .scene { position: absolute; inset: 0; overflow: hidden; }
+      .clip { position: absolute; inset: 0; }
+      .fill { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+      .layer { position: absolute; inset: 0; pointer-events: none; }
+      .kb { position: absolute; inset: 0; transform-origin: 50% 45%; will-change: transform; }
+
+      /* warm interior wash and cool window wash */
+      .warm { background: radial-gradient(ellipse 80% 55% at 55% 18%, rgba(255, 196, 120, 0.38), rgba(255, 170, 90, 0.08) 60%, rgba(0, 0, 0, 0) 80%); mix-blend-mode: soft-light; }
+      .cool { background: linear-gradient(180deg, rgba(120, 140, 165, 0.28), rgba(120, 140, 165, 0) 55%); mix-blend-mode: multiply; }
+      .dim { background: linear-gradient(180deg, rgba(30, 22, 16, 0.25), rgba(30, 22, 16, 0.05) 35%, rgba(30, 22, 16, 0.35)); }
+
+      /* diary photo card */
+      .card { position: absolute; left: 50%; background: var(--paper); padding: 22px 22px 26px; border-radius: 10px;
+              box-shadow: 0 30px 60px rgba(20, 12, 6, 0.45), 0 4px 10px rgba(20, 12, 6, 0.25); opacity: 0; }
+      .card .photo { position: relative; overflow: hidden; border-radius: 4px; background: #e9dcc6; }
+      .card .photo img { display: block; width: 100%; height: 100%; object-fit: cover; transform-origin: 50% 50%; }
+      .card .tape { position: absolute; top: -26px; left: 50%; width: 220px; height: 52px; margin-left: -110px; transform: rotate(-3deg);
+                    background: repeating-linear-gradient(135deg, rgba(143, 166, 133, 0.78) 0 14px, rgba(173, 194, 161, 0.78) 14px 28px);
+                    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); }
+      .card .shine { position: absolute; top: -20%; left: -60%; width: 40%; height: 140%; transform: rotate(18deg);
+                     background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 245, 225, 0.55), rgba(255, 255, 255, 0)); opacity: 0; }
+      .hl { position: absolute; left: 0; height: 46px; border-radius: 8px; background: rgba(143, 176, 120, 0.42); transform-origin: 0 50%; transform: scaleX(0); mix-blend-mode: multiply; }
+
+      /* captions */
+      .label { position: absolute; left: 0; right: 0; bottom: 230px; text-align: center; opacity: 0; }
+      .label .step { display: inline-block; font-size: 30px; letter-spacing: 0.32em; font-weight: 700; color: var(--cream); background: var(--sage-deep);
+                     padding: 10px 22px 8px 28px; border-radius: 40px; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25); }
+      .label .title { display: block; margin-top: 18px; font-size: 76px; font-style: italic; color: var(--cream); line-height: 1.05;
+                      text-shadow: 0 3px 14px rgba(20, 12, 6, 0.65), 0 1px 2px rgba(20, 12, 6, 0.6); }
+      .brand { position: absolute; top: 92px; left: 0; right: 0; text-align: center; font-size: 30px; letter-spacing: 0.18em; color: rgba(247, 237, 220, 0.86);
+               text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5); font-style: italic; }
+
+      /* particles */
+      .streak { position: absolute; top: 0; width: 2px; border-radius: 2px; background: linear-gradient(180deg, rgba(225, 235, 245, 0), rgba(225, 235, 245, 0.75)); transform: rotate(7deg); }
+      .drop { position: absolute; border-radius: 50%; background: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.85), rgba(210, 225, 240, 0.35) 40%, rgba(120, 140, 160, 0.25) 70%, rgba(255, 255, 255, 0.5) 100%);
+              box-shadow: 0 2px 3px rgba(40, 50, 60, 0.25); }
+      .steam { position: absolute; border-radius: 50%; background: radial-gradient(circle, rgba(255, 252, 245, 0.75), rgba(255, 252, 245, 0.25) 45%, rgba(255, 252, 245, 0) 70%); opacity: 0; }
+      .pop { position: absolute; border-radius: 50%; border: 3px solid rgba(255, 236, 190, 0.85); opacity: 0; }
+      .speck { position: absolute; border-radius: 50%; opacity: 0; }
+      .haze { position: absolute; width: 6px; border-radius: 6px; background: linear-gradient(180deg, rgba(255, 220, 170, 0), rgba(255, 220, 170, 0.35), rgba(255, 220, 170, 0)); opacity: 0; }
+
+      /* title card */
+      #titlecard { position: absolute; left: 90px; right: 90px; top: 640px; text-align: center; opacity: 0; }
+      #titlecard .kicker { font-size: 34px; letter-spacing: 0.34em; color: var(--cream); font-weight: 700; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.55); }
+      #titlecard h1 { margin-top: 18px; font-size: 118px; font-weight: 400; font-style: italic; line-height: 1.0; color: var(--cream); text-shadow: 0 4px 22px rgba(20, 12, 6, 0.7); }
+      #titlecard .ep { display: inline-block; margin-top: 34px; font-size: 38px; color: var(--ink); background: rgba(251, 244, 230, 0.92); padding: 14px 34px 12px; border-radius: 50px; }
+
+      #grain { position: absolute; inset: 0; background-image: url("assets/img/grain.png"); background-size: 512px 512px; opacity: 0.08; mix-blend-mode: overlay; pointer-events: none; }
+      #vignette { position: absolute; inset: 0; background: radial-gradient(ellipse 75% 62% at 50% 48%, rgba(0, 0, 0, 0) 60%, rgba(18, 10, 5, 0.55) 100%); pointer-events: none; }
+      #fadeout { position: absolute; inset: 0; background: #fbf1df; opacity: 0; pointer-events: none; }
+      svg { position: absolute; inset: 0; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="60" data-width="1080" data-height="1920" data-fps="24">
+      <audio id="asmr" class="clip" src="assets/audio/asmr.m4a" data-start="0" data-duration="60" data-volume="1" data-track-index="9"></audio>
+
+      <!-- ===================== ACT 1 ===================== -->
+      <!-- 01 · Establishing: the rainy window -->
+      <section id="s01" class="scene clip" data-start="0" data-duration="3.5" data-track-index="0">
+        <div class="kb" data-kb="1.02,1.14,0,0,0,40"><img class="fill" src="assets/img/window.jpg" alt="" /></div>
+        <div class="layer cool"></div><div class="layer warm"></div>
+        <div class="layer" data-rain="70,11"></div>
+        <div class="layer" data-glass="34,12"></div>
+        <div id="titlecard">
+          <div class="kicker">YUKI'S</div>
+          <h1>Cozy Kitchen<br />Diaries</h1>
+          <div class="ep">Episode 01 · Chicken Teriyaki Rice Bowl</div>
+        </div>
+      </section>
+
+      <!-- 02 · Introducing Yuki -->
+      <section id="s02" class="scene clip" data-start="3" data-duration="3.5" data-track-index="1">
+        <div class="kb" data-kb="1.04,1.13,0,-10,0,-30"><img class="fill" src="assets/img/yuki.jpg" alt="" /></div>
+        <div class="layer" data-rainshadow="16,21"></div>
+        <div class="layer warm"></div>
+        <div class="label" data-label-at="0.5"><span class="title">a quiet, rainy afternoon</span></div>
+      </section>
+
+      <!-- 03 · Her little companion -->
+      <section id="s03" class="scene clip" data-start="6" data-duration="3.5" data-track-index="0">
+        <div class="kb" data-kb="1.06,1.12,0,0,0,0"><img class="fill" src="assets/img/window_blur.jpg" alt="" /></div>
+        <div class="layer cool"></div>
+        <div class="layer" data-rain="50,31"></div>
+        <div class="card" style="top: 520px; width: 920px; margin-left: -460px" data-card="-5,-1.5">
+          <div class="tape"></div>
+          <div class="photo" style="height: 684px"><img src="assets/img/dog.jpg" alt="" data-kbin="1.04,1.14,20,-10" /></div>
+        </div>
+        <div class="layer" data-glass="18,33"></div>
+        <div class="label" data-label-at="0.45"><span class="title">my little companion</span></div>
+      </section>
+
+      <!-- 04 · Preparing to cook -->
+      <section id="s04" class="scene clip" data-start="9" data-duration="3.5" data-track-index="1">
+        <div class="kb" data-kb="1.10,1.16,0,0,0,0"><img class="fill" src="assets/img/kitchen_blur.jpg" alt="" /></div>
+        <div class="layer warm"></div>
+        <div class="card" style="top: 470px; width: 920px; margin-left: -460px" data-card="4,1">
+          <div class="tape"></div>
+          <div class="photo" id="tools" style="height: 806px; background: #fbf4e6"></div>
+        </div>
+        <div class="label" data-label-at="0.4"><span class="step">GETTING READY</span><span class="title">kitchen tools, all set</span></div>
+      </section>
+
+      <!-- ===================== ACT 2 ===================== -->
+      <!-- 05 · Cutting the chicken -->
+      <section id="s05" class="scene clip" data-start="12" data-duration="3.5" data-track-index="0">
+        <div class="kb" data-kb="1.12,1.18,0,20,0,0"><img class="fill" src="assets/img/kitchen_blur.jpg" alt="" /></div>
+        <div class="layer warm"></div>
+        <div class="card" style="top: 520px; width: 900px; margin-left: -450px" data-card="-4,-1">
+          <div class="tape"></div>
+          <div class="photo" style="height: 650px" data-bumps="0.25,0.58,0.91,1.24,1.57,1.90,2.23,2.56"><img src="assets/img/step1.jpg" alt="" data-kbin="1.02,1.1,0,0" /></div>
+        </div>
+        <div class="label" data-label-at="0.4"><span class="step">STEP 01</span><span class="title">slice the chicken</span></div>
+      </section>
+
+      <!-- 06 · Seasoning the chicken -->
+      <section id="s06" class="scene clip" data-start="15" data-duration="3.5" data-track-index="1">
+        <div class="kb" data-kb="1.12,1.16,0,-20,0,0"><img class="fill" src="assets/img/kitchen_blur.jpg" alt="" /></div>
+        <div class="layer warm"></div>
+        <div class="card" style="top: 520px; width: 900px; margin-left: -450px" data-card="3,1.2">
+          <div class="tape"></div>
+          <div class="photo" style="height: 650px"><img src="assets/img/step1.jpg" alt="" data-kbin="1.05,1.18,-20,10" />
+            <div class="layer" id="season"></div>
+          </div>
+        </div>
+        <div class="label" data-label-at="0.4"><span class="step">STEP 02</span><span class="title">salt, pepper &amp; cornstarch</span></div>
+      </section>
+
+      <!-- 07 · Chopping garlic and ginger -->
+      <section id="s07" class="scene clip" data-start="18" data-duration="3.5" data-track-index="0">
+        <div class="kb" data-kb="1.14,1.2,0,0,0,0"><img class="fill" src="assets/img/kitchen_blur.jpg" alt="" /></div>
+        <div class="layer warm"></div>
+        <div class="card" style="top: 600px; width: 940px; margin-left: -470px" data-card="-3,-1">
+          <div class="tape"></div>
+          <div class="photo" style="height: 376px; background: #fbf4e6" data-bumps="0.2,0.42,0.64,0.86,1.08,1.30,1.52,1.74,1.96">
+            <img src="assets/img/list_sauce.jpg" alt="" style="height: auto" />
+            <div class="hl" style="top: 270px; width: 520px; left: 40px" data-hl-at="0.5"></div>
+            <div class="hl" style="top: 320px; width: 470px; left: 40px" data-hl-at="1.3"></div>
+          </div>
+        </div>
+        <div class="label" data-label-at="0.4"><span class="step">STEP 03</span><span class="title">garlic &amp; ginger</span></div>
+      </section>
+
+      <!-- 08 · Preparing vegetables -->
+      <section id="s08" class="scene clip" data-start="21" data-duration="3.5" data-track-index="1">
+        <div class="kb" data-kb="1.14,1.2,0,-20,0,0"><img class="fill" src="assets/img/kitchen_blur.jpg" alt="" /></div>
+        <div class="layer warm"></div>
+        <div class="card" style="top: 600px; width: 940px; margin-left: -470px" data-card="3,1">
+          <div class="tape"></div>
+          <div class="photo" style="height: 376px; background: #fbf4e6" data-bumps="0.2,0.4,0.6,0.8,1.0,1.2,2.1,2.25,2.4,2.55,2.7">
+            <img src="assets/img/list_serve.jpg" alt="" style="height: auto" />
+            <div class="hl" style="top: 105px; width: 420px; left: 40px" data-hl-at="0.4"></div>
+            <div class="hl" style="top: 157px; width: 420px; left: 40px" data-hl-at="1.1"></div>
+            <div class="hl" style="top: 209px; width: 470px; left: 40px" data-hl-at="1.9"></div>
+          </div>
+        </div>
+        <div class="label" data-label-at="0.4"><span class="step">STEP 04</span><span class="title">fresh vegetables</span></div>
+      </section>
+
+      <!-- 09 · Homemade teriyaki sauce -->
+      <section id="s09" class="scene clip" data-start="24" data-duration="3.5" data-track-index="0">
+        <div class="kb" data-kb="1.12,1.18,0,0,0,0"><img class="fill" src="assets/img/kitchen_blur.jpg" alt="" /></div>
+        <div class="layer warm"></div>
+        <div class="card" style="top: 560px; width: 940px; margin-left: -470px" data-card="-2,0.8">
+          <div class="tape"></div>
+          <div class="photo" style="height: 376px; background: #fbf4e6">
+            <img src="assets/img/list_sauce.jpg" alt="" style="height: auto" />
+            <div class="hl" style="top: 69px; width: 360px; left: 40px" data-hl-at="0.15"></div>
+            <div class="hl" style="top: 119px; width: 600px; left: 40px" data-hl-at="0.55"></div>
+            <div class="hl" style="top: 170px; width: 420px; left: 40px" data-hl-at="0.95"></div>
+            <div class="hl" style="top: 219px; width: 400px; left: 40px" data-hl-at="1.35"></div>
+          </div>
+        </div>
+        <svg viewBox="0 0 1080 1920"><circle id="whisk" cx="540" cy="1170" r="120" fill="none" stroke="#f7eddc" stroke-width="10" stroke-linecap="round" stroke-dasharray="40 30" opacity="0" /></svg>
+        <div class="label" data-label-at="0.4"><span class="step">STEP 05</span><span class="title">homemade teriyaki sauce</span></div>
+      </section>
+
+      <!-- ===================== ACT 3 ===================== -->
+      <!-- 10 · Heating the skillet -->
+      <section id="s10" class="scene clip" data-start="27" data-duration="3.5" data-track-index="1">
+        <div class="kb" data-kb="1.12,1.18,0,0,0,0"><img class="fill" src="assets/img/kitchen_blur.jpg" alt="" /></div>
+        <div class="layer warm"></div>
+        <div class="card" style="top: 300px; width: 520px; margin-left: -260px" data-card="3,1">
+          <div class="tape"></div>
+          <div class="photo" style="height: 1150px"><img src="assets/img/stove.jpg" alt="" data-kbin="1.02,1.1,0,-20" />
+            <div class="layer" id="haze"></div>
+            <div class="layer" id="flame" style="background: radial-gradient(ellipse 60% 18% at 50% 70%, rgba(110, 160, 255, 0.55), rgba(255, 170, 80, 0.25) 50%, rgba(0, 0, 0, 0) 75%); mix-blend-mode: screen; opacity: 0"></div>
+          </div>
+        </div>
+        <div class="label" data-label-at="0.4"><span class="step">STEP 06</span><span class="title">heat the skillet</span></div>
+      </section>
+
+      <!-- 11 · Frying the chicken -->
+      <section id="s11" class="scene clip" data-start="30" data-duration="3.5" data-track-index="0">
+        <div class="kb" data-kb="1.12,1.18,0,0,0,0"><img class="fill" src="assets/img/kitchen_blur.jpg" alt="" /></div>
+        <div class="layer warm"></div>
+        <div class="card" style="top: 520px; width: 920px; margin-left: -460px" data-card="-3,-1">
+          <div class="tape"></div>
+          <div class="photo" style="height: 640px"><img src="assets/img/step2.jpg" alt="" data-kbin="1.06,1.16,0,0" />
+            <div class="layer" data-sizzle="40,111"></div>
+          </div>
+        </div>
+        <div class="layer" data-steam="540,640,6,112"></div>
+        <div class="label" data-label-at="0.4"><span class="step">STEP 07</span><span class="title">sear the chicken</span></div>
+      </section>
+
+      <!-- 12 · Turning the chicken -->
+      <section id="s12" class="scene clip" data-start="33" data-duration="3.5" data-track-index="1">
+        <div class="kb" data-kb="1.14,1.2,0,0,0,0"><img class="fill" src="assets/img/kitchen_blur.jpg" alt="" /></div>
+        <div class="layer warm"></div>
+        <div class="card" style="top: 520px; width: 920px; margin-left: -460px" data-card="3,1.2">
+          <div class="tape"></div>
+          <div class="photo" style="height: 640px" data-bumps="0.3,0.95,1.6,2.25"><img src="assets/img/step2.jpg" alt="" data-kbin="1.35,1.5,-40,20" />
+            <div class="layer" data-sizzle="30,121"></div>
+          </div>
+        </div>
+        <div class="layer" data-steam="540,620,6,122"></div>
+        <div class="label" data-label-at="0.4"><span class="step">STEP 08</span><span class="title">golden on every side</span></div>
+      </section>
+
+      <!-- 13 · Adding teriyaki sauce -->
+      <section id="s13" class="scene clip" data-start="36" data-duration="3.5" data-track-index="0">
+        <div class="kb" data-kb="1.12,1.18,0,0,0,0"><img class="fill" src="assets/img/kitchen_blur.jpg" alt="" /></div>
+        <div class="layer warm"></div>
+        <div class="card" style="top: 520px; width: 920px; margin-left: -460px" data-card="-3,-1">
+          <div class="tape"></div>
+          <div class="photo" style="height: 640px"><img src="assets/img/step3.jpg" alt="" data-kbin="1.08,1.2,0,-10" />
+            <div class="layer" data-bubbles="34,131"></div>
+          </div>
+        </div>
+        <div class="layer" data-steam="540,640,7,132"></div>
+        <div class="label" data-label-at="0.4"><span class="step">STEP 09</span><span class="title">pour in the sauce</span></div>
+      </section>
+
+      <!-- 14 · The glossy teriyaki glaze -->
+      <section id="s14" class="scene clip" data-start="39" data-duration="3.5" data-track-index="1">
+        <div class="kb" data-kb="1.12,1.18,0,0,0,0"><img class="fill" src="assets/img/kitchen_blur.jpg" alt="" /></div>
+        <div class="layer warm"></div>
+        <div class="card" style="top: 520px; width: 920px; margin-left: -460px" data-card="3,1">
+          <div class="tape"></div>
+          <div class="photo" style="height: 640px"><img src="assets/img/step4.jpg" alt="" data-kbin="1.06,1.2,10,0" />
+            <div class="layer" data-bubbles="18,141"></div>
+            <div class="shine" data-shine-at="1.2"></div>
+          </div>
+        </div>
+        <div class="layer" data-steam="540,620,7,142"></div>
+        <div class="label" data-label-at="0.4"><span class="step">STEP 10</span><span class="title">a glossy teriyaki glaze</span></div>
+      </section>
+
+      <!-- 15 · Steaming the vegetables (illustrated) -->
+      <section id="s15" class="scene clip" data-start="42" data-duration="3.5" data-track-index="0">
+        <div class="kb" data-kb="1.12,1.18,0,0,0,0"><img class="fill" src="assets/img/kitchen_blur.jpg" alt="" /></div>
+        <div class="layer warm"></div>
+        <div class="layer dim"></div>
+        <svg viewBox="0 0 1080 1920" id="steamer">
+          <defs>
+            <linearGradient id="bamboo" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#e2c48c" /><stop offset="1" stop-color="#b98f52" /></linearGradient>
+          </defs>
+          <ellipse cx="540" cy="1265" rx="330" ry="70" fill="#000" opacity="0.25" />
+          <path d="M210,1010 L210,1180 A330,90 0 0 0 870,1180 L870,1010 Z" fill="url(#bamboo)" />
+          <g stroke="#9c7440" stroke-width="3" opacity="0.6"><path d="M210,1060 A330,90 0 0 0 870,1060" fill="none" /><path d="M210,1120 A330,90 0 0 0 870,1120" fill="none" /></g>
+          <ellipse cx="540" cy="1010" rx="330" ry="90" fill="#d6b77c" stroke="#a87d45" stroke-width="6" />
+          <ellipse cx="540" cy="1014" rx="300" ry="76" fill="#f3ead6" />
+          <g id="steamVeg"></g>
+          <g id="lid">
+            <path d="M210,1006 A330,90 0 0 1 870,1006 Q870,860 540,840 Q210,860 210,1006 Z" fill="url(#bamboo)" stroke="#a87d45" stroke-width="6" />
+            <g stroke="#9c7440" stroke-width="3" opacity="0.55" fill="none"><path d="M260,960 Q540,860 820,960" /><path d="M330,905 Q540,850 750,905" /></g>
+            <ellipse cx="540" cy="850" rx="50" ry="16" fill="#b98f52" />
+          </g>
+        </svg>
+        <div class="layer" data-steam="540,960,10,151" data-steam-from="0.55"></div>
+        <div class="label" data-label-at="0.4"><span class="step">STEP 11</span><span class="title">steam the broccoli &amp; carrots</span></div>
+      </section>
+
+      <!-- ===================== ACT 4 (16–19, one continuous plating) ===================== -->
+      <section id="s16" class="scene clip" data-start="45" data-duration="12.5" data-track-index="1">
+        <div class="kb" data-kb="1.12,1.2,0,0,0,0"><img class="fill" src="assets/img/kitchen_blur.jpg" alt="" /></div>
+        <div class="layer warm"></div>
+        <div class="layer dim"></div>
+        <svg viewBox="0 0 1080 1920" id="bowl">
+          <defs>
+            <linearGradient id="ceramic" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#f6ecdb" /><stop offset="1" stop-color="#d8c3a1" /></linearGradient>
+            <radialGradient id="glaze" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#c7743a" /><stop offset="0.55" stop-color="#8a3f18" /><stop offset="1" stop-color="#5a240b" /></radialGradient>
+          </defs>
+          <ellipse cx="540" cy="1395" rx="300" ry="50" fill="#000" opacity="0.28" />
+          <ellipse cx="540" cy="1020" rx="360" ry="100" fill="#e7d6bb" />
+          <ellipse cx="540" cy="1024" rx="340" ry="86" fill="#cbb48f" />
+          <g id="rice"></g>
+          <g id="chicken"></g>
+          <path id="drizzle" d="M380,930 C430,890 470,960 520,915 S620,880 680,930" fill="none" stroke="#6b2a0c" stroke-width="12" stroke-linecap="round" opacity="0.9" />
+          <g id="veg"></g>
+          <g id="garnish"></g>
+          <path d="M180,1020 A360,100 0 0 0 900,1020 C892,1250 730,1370 540,1370 C350,1370 188,1250 180,1020 Z" fill="url(#ceramic)" />
+          <path d="M180,1020 A360,100 0 0 0 900,1020" fill="none" stroke="#8fa685" stroke-width="14" />
+          <path d="M240,1150 C300,1260 420,1320 540,1325" fill="none" stroke="#fffaf0" stroke-width="10" stroke-linecap="round" opacity="0.5" />
+          <ellipse cx="540" cy="1372" rx="140" ry="22" fill="#cbb38d" />
+        </svg>
+        <div class="layer" data-steam="540,900,12,161"></div>
+        <div class="label" data-label-at="0.35" data-label-out="3"><span class="step">STEP 12</span><span class="title">fluffy white rice</span></div>
+        <div class="label" data-label-at="3.25" data-label-out="6"><span class="step">STEP 13</span><span class="title">teriyaki chicken on top</span></div>
+        <div class="label" data-label-at="6.25" data-label-out="9"><span class="step">STEP 14</span><span class="title">broccoli &amp; carrots</span></div>
+        <div class="label" data-label-at="9.25"><span class="step">STEP 15</span><span class="title">sesame &amp; spring onion</span></div>
+      </section>
+
+      <!-- 20 · The perfect rainy-day meal -->
+      <section id="s20" class="scene clip" data-start="57" data-duration="3" data-track-index="0">
+        <div class="kb" data-kb="1.08,1.14,0,0,0,0"><img class="fill" src="assets/img/window_blur.jpg" alt="" /></div>
+        <div class="layer cool"></div>
+        <div class="layer" data-rain="60,201"></div>
+        <div class="card" id="finalYuki" style="top: 300px; width: 600px; margin-left: -470px" data-card="-6,-4">
+          <div class="tape"></div>
+          <div class="photo" style="height: 760px"><img src="assets/img/yuki.jpg" alt="" data-kbin="1.0,1.06,0,0" /></div>
+        </div>
+        <div class="card" id="finalBowl" style="top: 820px; width: 700px; margin-left: -230px" data-card="5,2.5" data-card-at="0.35">
+          <div class="tape"></div>
+          <div class="photo" style="height: 640px"><img src="assets/img/bowl_hero.jpg" alt="" data-kbin="1.0,1.08,0,0" /></div>
+        </div>
+        <div class="layer" data-steam="660,900,7,202"></div>
+        <div class="layer warm"></div>
+        <div class="label" data-label-at="0.6" style="bottom: 150px"><span class="title" style="font-size: 64px">see you on the next rainy day</span></div>
+      </section>
+
+      <!-- global finishing layers -->
+      <div id="brand" class="brand clip" data-start="3" data-duration="54" data-track-index="5">Yuki's Cozy Kitchen Diaries · Ep. 01</div>
+      <div id="grain"></div>
+      <div id="vignette"></div>
+      <div id="fadeout"></div>
+    </div>
+
+    <script>
+      (function () {
+        const tl = gsap.timeline({ paused: true });
+        window.__timelines = window.__timelines || {};
+        window.__timelines["main"] = tl;
+
+        // ---------- deterministic randomness ----------
+        function rng(seed) {
+          let a = seed >>> 0;
+          return function () {
+            a = (a + 0x6d2b79f5) >>> 0;
+            let t = a;
+            t = Math.imul(t ^ (t >>> 15), t | 1);
+            t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+            return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+          };
+        }
+        const nums = (s) => s.split(",").map(Number);
+        const sceneOf = (el) => el.closest(".scene");
+        const startOf = (el) => Number(sceneOf(el).dataset.start);
+        const durOf = (el) => Number(sceneOf(el).dataset.duration);
+        const SVGNS = "http://www.w3.org/2000/svg";
+        function svgEl(tag, attrs, parent) {
+          const e = document.createElementNS(SVGNS, tag);
+          for (const k in attrs) e.setAttribute(k, attrs[k]);
+          parent.appendChild(e);
+          return e;
+        }
+        function div(cls, style, parent) {
+          const d = document.createElement("div");
+          d.className = cls;
+          Object.assign(d.style, style);
+          parent.appendChild(d);
+          return d;
+        }
+
+        // ---------- scene crossfades ----------
+        document.querySelectorAll(".scene").forEach((s) => {
+          const st = Number(s.dataset.start);
+          if (st > 0) tl.fromTo(s, { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "sine.inOut" }, st);
+        });
+
+        // ---------- Ken Burns ----------
+        document.querySelectorAll("[data-kb]").forEach((el) => {
+          const [s0, s1, x0, x1, y0, y1] = nums(el.dataset.kb);
+          tl.fromTo(el, { scale: s0, x: x0, y: y0 }, { scale: s1, x: x1, y: y1, duration: durOf(el), ease: "none" }, startOf(el));
+        });
+        document.querySelectorAll("[data-kbin]").forEach((el) => {
+          const [s0, s1, x0, x1] = nums(el.dataset.kbin);
+          tl.fromTo(el, { scale: s0, x: x0 }, { scale: s1, x: x1, duration: durOf(el), ease: "none" }, startOf(el));
+        });
+
+        // ---------- cards, labels, highlights, bumps, shine ----------
+        document.querySelectorAll("[data-card]").forEach((el) => {
+          const [r0, r1] = nums(el.dataset.card);
+          const at = startOf(el) + Number(el.dataset.cardAt || 0.05);
+          tl.fromTo(el, { y: 150, opacity: 0, rotation: r0, scale: 0.93 }, { y: 0, opacity: 1, rotation: r1, scale: 1, duration: 0.9, ease: "power3.out" }, at);
+        });
+        document.querySelectorAll("[data-label-at]").forEach((el) => {
+          const at = startOf(el) + Number(el.dataset.labelAt);
+          tl.fromTo(el, { y: 36, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: "power2.out" }, at);
+          if (el.dataset.labelOut) tl.to(el, { y: -20, opacity: 0, duration: 0.3, ease: "power1.in" }, startOf(el) + Number(el.dataset.labelOut) - 0.3);
+        });
+        document.querySelectorAll("[data-hl-at]").forEach((el) => {
+          tl.fromTo(el, { scaleX: 0 }, { scaleX: 1, duration: 0.45, ease: "power2.inOut" }, startOf(el) + Number(el.dataset.hlAt));
+        });
+        document.querySelectorAll("[data-bumps]").forEach((el) => {
+          nums(el.dataset.bumps).forEach((t) => {
+            tl.fromTo(el, { y: 0 }, { y: 7, duration: 0.05, yoyo: true, repeat: 1, ease: "power1.out", immediateRender: false }, startOf(el) + t);
+          });
+        });
+        document.querySelectorAll("[data-shine-at]").forEach((el) => {
+          tl.fromTo(el, { x: 0, opacity: 0.9 }, { x: 1700, opacity: 0.9, duration: 1.1, ease: "power2.inOut" }, startOf(el) + Number(el.dataset.shineAt));
+        });
+
+        // ---------- rain streaks ----------
+        document.querySelectorAll("[data-rain]").forEach((layer) => {
+          const [n, seed] = nums(layer.dataset.rain);
+          const r = rng(seed), t0 = startOf(layer), dur = durOf(layer);
+          for (let i = 0; i < n; i++) {
+            const h = 70 + r() * 120;
+            const s = div("streak", { left: r() * 1120 - 20 + "px", height: h + "px", opacity: 0.25 + r() * 0.45 }, layer);
+            const y0 = -260 - r() * 2100, speed = 2600 + r() * 1400;
+            const d = (2200 - y0) / speed;
+            tl.fromTo(s, { y: y0 }, { y: 2200, duration: d, ease: "none", repeat: Math.ceil(dur / d) + 1, immediateRender: true }, t0);
+          }
+        });
+        // ---------- droplets on glass ----------
+        document.querySelectorAll("[data-glass]").forEach((layer) => {
+          const [n, seed] = nums(layer.dataset.glass);
+          const r = rng(seed), t0 = startOf(layer), dur = durOf(layer);
+          for (let i = 0; i < n; i++) {
+            const size = 7 + r() * 16;
+            const d = div("drop", { left: r() * 1060 + "px", top: r() * 1700 + "px", width: size + "px", height: size * 1.15 + "px", opacity: 0.55 + r() * 0.4 }, layer);
+            if (r() < 0.5) {
+              const slide = 200 + r() * 700;
+              tl.fromTo(d, { y: 0, x: 0 }, { y: slide, x: (r() - 0.5) * 30, duration: dur * (0.6 + r() * 0.4), ease: "power1.in" }, t0 + r() * 0.8);
+            }
+          }
+        });
+        // ---------- rain shadows on Yuki's wall ----------
+        document.querySelectorAll("[data-rainshadow]").forEach((layer) => {
+          const [n, seed] = nums(layer.dataset.rainshadow);
+          const r = rng(seed), t0 = startOf(layer), dur = durOf(layer);
+          layer.style.mixBlendMode = "multiply";
+          for (let i = 0; i < n; i++) {
+            const w = 10 + r() * 26;
+            const s = div("streak", { left: r() * 1080 + "px", width: w + "px", height: 220 + r() * 300 + "px", opacity: 0.12 + r() * 0.12,
+              background: "linear-gradient(180deg, rgba(60,70,90,0), rgba(60,70,90,0.9), rgba(60,70,90,0))", filter: "blur(6px)" }, layer);
+            tl.fromTo(s, { y: -600 - r() * 600 }, { y: 1900 + r() * 400, duration: dur * (0.9 + r() * 0.6), ease: "none" }, t0);
+          }
+        });
+        // ---------- steam ----------
+        document.querySelectorAll("[data-steam]").forEach((layer) => {
+          const [cx, cy, n, seed] = nums(layer.dataset.steam);
+          const r = rng(seed), t0 = startOf(layer) + Number(layer.dataset.steamFrom || 0), end = startOf(layer) + durOf(layer);
+          for (let i = 0; i < n; i++) {
+            const size = 170 + r() * 220;
+            const s = div("steam", { left: cx - size / 2 + (r() - 0.5) * 360 + "px", top: cy - size / 2 + "px", width: size + "px", height: size + "px" }, layer);
+            const p = 2.0 + r() * 1.4, start = t0 + r() * p, reps = Math.max(0, Math.ceil((end - start) / p));
+            const drift = (r() - 0.5) * 160;
+            tl.fromTo(s, { y: 0, x: 0, scale: 0.5 }, { y: -420 - r() * 200, x: drift, scale: 1.7, duration: p, ease: "sine.out", repeat: reps, immediateRender: false }, start);
+            tl.fromTo(s, { opacity: 0 }, { opacity: 0.32 + r() * 0.2, duration: p / 2, ease: "sine.inOut", yoyo: true, repeat: reps * 2 + 1, immediateRender: false }, start);
+          }
+        });
+        // ---------- sizzle pops (inside photo) ----------
+        document.querySelectorAll("[data-sizzle]").forEach((layer) => {
+          const [n, seed] = nums(layer.dataset.sizzle);
+          const r = rng(seed), t0 = startOf(layer), end = t0 + durOf(layer);
+          for (let i = 0; i < n; i++) {
+            const size = 8 + r() * 22;
+            const s = div("pop", { left: 60 + r() * 760 + "px", top: 60 + r() * 520 + "px", width: size + "px", height: size + "px" }, layer);
+            const p = 0.35 + r() * 0.5, start = t0 + r() * p, reps = Math.ceil((end - start) / p);
+            tl.fromTo(s, { scale: 0.2, opacity: 0.95 }, { scale: 1.3, opacity: 0, duration: p, ease: "power2.out", repeat: reps, immediateRender: false }, start);
+          }
+        });
+        // ---------- sauce bubbles (inside photo) ----------
+        document.querySelectorAll("[data-bubbles]").forEach((layer) => {
+          const [n, seed] = nums(layer.dataset.bubbles);
+          const r = rng(seed), t0 = startOf(layer) + 0.5, end = startOf(layer) + durOf(layer);
+          for (let i = 0; i < n; i++) {
+            const size = 14 + r() * 34;
+            const s = div("pop", { left: 120 + r() * 640 + "px", top: 120 + r() * 400 + "px", width: size + "px", height: size + "px", borderColor: "rgba(255,210,150,0.8)", borderWidth: "4px" }, layer);
+            const p = 0.6 + r() * 0.7, start = t0 + r() * p, reps = Math.ceil((end - start) / p);
+            tl.fromTo(s, { scale: 0.1, opacity: 0.9 }, { scale: 1, opacity: 0, duration: p, ease: "power1.out", repeat: reps, immediateRender: false }, start);
+          }
+        });
+
+        // ---------- 01: title card ----------
+        tl.fromTo("#titlecard", { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, ease: "power2.out" }, 0.15);
+        tl.to("#titlecard", { y: -30, opacity: 0, duration: 0.35, ease: "power1.in" }, 2.6);
+
+        // ---------- 04: tools reveal tile by tile ----------
+        (function () {
+          const box = document.getElementById("tools");
+          const W = 876, H = 806, cols = 3, rows = 2, t0 = 9 + 0.35;
+          for (let i = 0; i < rows * cols; i++) {
+            const c = i % cols, rr = Math.floor(i / cols);
+            const tile = div("", { position: "absolute", left: (c * W) / cols + "px", top: (rr * H) / rows + "px", width: W / cols + "px", height: H / rows + "px",
+              backgroundImage: "url(assets/img/tools.jpg)", backgroundSize: W + "px " + H + "px", backgroundPosition: -(c * W) / cols + "px " + -(rr * H) / rows + "px", opacity: 0 }, box);
+            tl.fromTo(tile, { scale: 0.6, opacity: 0, y: 30 }, { scale: 1, opacity: 1, y: 0, duration: 0.45, ease: "back.out(1.8)" }, t0 + i * 0.28);
+          }
+        })();
+
+        // ---------- 06: seasoning falls ----------
+        (function () {
+          const layer = document.getElementById("season"), r = rng(61), t0 = 15;
+          const kinds = [
+            { n: 26, color: "#fbfbf6", size: [5, 8], at: 0.25 },   // salt
+            { n: 26, color: "#2b2420", size: [4, 7], at: 0.85 },   // pepper
+            { n: 40, color: "#fffef8", size: [8, 16], at: 1.45 },  // cornstarch "snow"
+          ];
+          kinds.forEach((k) => {
+            for (let i = 0; i < k.n; i++) {
+              const s = k.size[0] + r() * (k.size[1] - k.size[0]);
+              const p = div("speck", { left: 200 + r() * 480 + "px", top: "-30px", width: s + "px", height: s + "px", background: k.color, boxShadow: "0 0 4px rgba(255,255,255,0.6)" }, layer);
+              const at = t0 + k.at + r() * 0.55;
+              tl.fromTo(p, { y: 0, opacity: 1, x: 0 }, { y: 380 + r() * 220, x: (r() - 0.5) * 80, duration: 0.8 + r() * 0.5, ease: "power1.in", immediateRender: false }, at);
+              tl.to(p, { opacity: 0, duration: 0.25 }, at + 1.3);
+            }
+          });
+        })();
+
+        // ---------- 09: whisk swirl ----------
+        tl.fromTo("#whisk", { opacity: 0, rotation: 0, svgOrigin: "540 1170" }, { opacity: 0.8, duration: 0.3 }, 24 + 1.6);
+        tl.to("#whisk", { rotation: 720, svgOrigin: "540 1170", duration: 1.3, ease: "power1.inOut" }, 24 + 1.6);
+        tl.to("#whisk", { opacity: 0, duration: 0.3 }, 24 + 2.75);
+
+        // ---------- 10: flame + heat haze ----------
+        tl.fromTo("#flame", { opacity: 0 }, { opacity: 1, duration: 0.25, ease: "power2.out" }, 27 + 0.35);
+        tl.fromTo("#flame", { scale: 1 }, { scale: 1.04, duration: 0.18, yoyo: true, repeat: 15, ease: "sine.inOut", immediateRender: false }, 27 + 0.6);
+        (function () {
+          const layer = document.getElementById("haze"), r = rng(101);
+          for (let i = 0; i < 12; i++) {
+            const h = div("haze", { left: 80 + r() * 320 + "px", top: 520 + r() * 200 + "px", height: 120 + r() * 120 + "px" }, layer);
+            const p = 0.9 + r() * 0.6, start = 28.3 + r() * p, reps = Math.ceil((30.5 - start) / p);
+            tl.fromTo(h, { y: 0, opacity: 0, scaleX: 1 }, { y: -260, opacity: 0.9, scaleX: 2.5, duration: p, ease: "sine.in", repeat: reps, immediateRender: false }, start);
+          }
+        })();
+
+        // ---------- 15: steamer veg + lid lift ----------
+        function broccoli(g, x, y, s, r) {
+          const wrap = svgEl("g", {}, g);
+          const grp = svgEl("g", { transform: `translate(${x},${y}) scale(${s})` }, wrap);
+          svgEl("path", { d: "M-8,10 L-12,48 L12,48 L8,10 Z", fill: "#a9c98a" }, grp);
+          [[-22, -2, 20], [0, -14, 24], [22, -2, 20], [-10, 8, 18], [12, 8, 18], [0, 0, 18]].forEach(([cx, cy, rr]) =>
+            svgEl("circle", { cx, cy, r: rr, fill: r() < 0.5 ? "#4f8a3a" : "#5f9d45" }, grp));
+          for (let i = 0; i < 6; i++) svgEl("circle", { cx: (r() - 0.5) * 50, cy: -10 + (r() - 0.5) * 24, r: 4, fill: "#7fb85f", opacity: 0.8 }, grp);
+          return wrap;
+        }
+        function carrot(g, x, y, rot) {
+          const wrap = svgEl("g", {}, g);
+          svgEl("rect", { x: x - 34, y: y - 4, width: 68, height: 9, rx: 4, fill: "#f08a2c", transform: `rotate(${rot} ${x} ${y})` }, wrap);
+          return wrap;
+        }
+        (function () {
+          const g = document.getElementById("steamVeg"), r = rng(150);
+          [[400, 990, 1.2], [470, 975, 1.0], [540, 995, 1.25], [380, 1030, 1.0]].forEach(([x, y, s]) => broccoli(g, x, y, s, r));
+          for (let i = 0; i < 14; i++) carrot(g, 620 + r() * 150, 985 + r() * 50, -40 + r() * 80);
+          tl.fromTo("#lid", { y: 0, rotation: 0, svgOrigin: "540 1006" }, { y: -330, rotation: -9, svgOrigin: "540 1006", duration: 0.7, ease: "power2.out" }, 42 + 0.5);
+          tl.to("#lid", { opacity: 0, duration: 0.6 }, 42 + 1.0);
+        })();
+
+        // ---------- 16–19: continuous plating ----------
+        (function () {
+          const T = 45, r = rng(160);
+          // rice — two scoops
+          const rice = document.getElementById("rice");
+          for (let i = 0; i < 240; i++) {
+            const u = r() * 2 - 1;
+            const top = 1000 - 115 * (1 - u * u) - 10;
+            const front = 1020 + 86 * Math.sqrt(1 - u * u);
+            const x = 540 + u * 315, y = top + r() * (front - top - 4);
+            const gr = svgEl("g", {}, rice); svgEl("ellipse", { cx: x, cy: y, rx: 6.5, ry: 11, fill: r() < 0.15 ? "#efe9dc" : "#fffdf6", stroke: "#e4dccb", "stroke-width": 1, transform: `rotate(${(r() - 0.5) * 140} ${x} ${y})` }, gr);
+            const batch = i < 130 ? 0.35 : 1.15;
+            tl.fromTo(gr, { y: -650 - r() * 200, opacity: 0 }, { y: 0, opacity: 1, duration: 0.55 + r() * 0.25, ease: "power2.in", immediateRender: true }, T + batch + r() * 0.5);
+          }
+          // chicken — nine glossy pieces
+          const ch = document.getElementById("chicken");
+          const spots = [[430, 925], [505, 905], [580, 915], [650, 935], [470, 955], [545, 950], [620, 965], [395, 965], [700, 975]];
+          spots.forEach(([x, y], i) => {
+            const g = svgEl("g", {}, ch);
+            const rot = (r() - 0.5) * 50;
+            svgEl("rect", { x: x - 44, y: y - 32, width: 88, height: 64, rx: 18, fill: "url(#glaze)", stroke: "#4a1c07", "stroke-width": 2, transform: `rotate(${rot} ${x} ${y})` }, g);
+            svgEl("ellipse", { cx: x - 12, cy: y - 14, rx: 22, ry: 7, fill: "#fff3dc", opacity: 0.55, transform: `rotate(${rot} ${x} ${y})` }, g);
+            tl.fromTo(g, { y: -700, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "back.out(1.3)", immediateRender: true }, T + 3.25 + i * 0.22);
+          });
+          const dr = document.getElementById("drizzle"), len = 420;
+          dr.setAttribute("stroke-dasharray", len);
+          tl.fromTo(dr, { attr: { "stroke-dashoffset": len }, opacity: 0.9 }, { attr: { "stroke-dashoffset": 0 }, duration: 0.6, ease: "power1.inOut", immediateRender: true }, T + 5.35);
+          // vegetables
+          const veg = document.getElementById("veg");
+          [[300, 985, 0.95], [350, 945, 1.05], [330, 1010, 0.85]].forEach(([x, y, s], i) => {
+            const b = broccoli(veg, x, y, s, r);
+            tl.fromTo(b, { y: -700, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "back.out(1.2)", immediateRender: true }, T + 6.3 + i * 0.45);
+          });
+          for (let i = 0; i < 14; i++) {
+            const c = carrot(veg, 760 + r() * 70, 950 + r() * 70, -50 + r() * 100);
+            tl.fromTo(c, { y: -650, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45, ease: "power2.in", immediateRender: true }, T + 7.6 + i * 0.06);
+          }
+          // garnish — sesame, spring onion rings, nori
+          const gar = document.getElementById("garnish");
+          for (let i = 0; i < 70; i++) {
+            const x = 390 + r() * 330, y = 900 + r() * 85;
+            const s = svgEl("g", {}, gar); svgEl("ellipse", { cx: x, cy: y, rx: 4.5, ry: 2.6, fill: "#fff1cf", transform: `rotate(${r() * 180} ${x} ${y})` }, s);
+            tl.fromTo(s, { y: -600, opacity: 0 }, { y: 0, opacity: 1, duration: 0.9 + r() * 0.4, ease: "power1.in", immediateRender: true }, T + 9.3 + r() * 1.3);
+          }
+          for (let i = 0; i < 18; i++) {
+            const x = 400 + r() * 310, y = 905 + r() * 75;
+            const ring = svgEl("circle", { cx: x, cy: y, r: 9, fill: "none", stroke: r() < 0.5 ? "#6fae3e" : "#9ccc65", "stroke-width": 5 }, gar);
+            tl.fromTo(ring, { y: -620, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8 + r() * 0.3, ease: "power1.in", immediateRender: true }, T + 9.6 + r() * 1.2);
+          }
+          [[470, 905, -20], [560, 900, 15], [640, 915, -8]].forEach(([x, y, rot], i) => {
+            const n = svgEl("g", {}, gar); svgEl("rect", { x: x - 50, y: y - 7, width: 100, height: 14, rx: 2, fill: "#24301f", transform: `rotate(${rot} ${x} ${y})` }, n);
+            tl.fromTo(n, { y: -600, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: "power2.in", immediateRender: true }, T + 10.9 + i * 0.2);
+          });
+          // gentle camera settle on the finished bowl
+          tl.fromTo("#bowl", { scale: 1, svgOrigin: "540 900" }, { scale: 1.1, svgOrigin: "540 900", duration: 3, ease: "sine.inOut", immediateRender: true }, T + 9);
+        })();
+
+        // ---------- 20: final hold + soft fade ----------
+        tl.fromTo("#fadeout", { opacity: 0 }, { opacity: 0.35, duration: 0.6, ease: "sine.in" }, 59.4);
+
+        tl.seek(0);
+      })();
+    </script>
+  </body>
+</html>
